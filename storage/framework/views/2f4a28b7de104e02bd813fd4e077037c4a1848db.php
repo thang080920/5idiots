@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="<?php echo e(str_replace('_', '-', app()->getLocale())); ?>">
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSRF Token -->
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
+
+    <title><?php echo e(config('app.name', 'Laravel')); ?></title>
+
+    <!-- Scripts -->
+    <script src="<?php echo e(asset('js/app.js')); ?>" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+    <!-- Fonts -->
+    <link rel="dns-prefetch" href="//fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet" type="text/css">
+
+    <!-- Styles -->
+    <link href="<?php echo e(asset('css/app.css')); ?>" rel="stylesheet">
+</head>
+<body>
+	<nav class="navbar navbar-expand-md navbar-light navbar-laravel">
+        <div class="container">
+            <a class="navbar-brand" href="<?php echo e(url('/')); ?>">
+                <?php echo e(config('app.firstname', 'Laravel')); ?>
+
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="<?php echo e(__('Toggle navigation')); ?>">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <!-- Left Side Of Navbar -->
+                <ul class="navbar-nav mr-auto">
+
+                </ul>
+
+                <!-- Right Side Of Navbar -->
+                <ul class="navbar-nav ml-auto">
+                    <!-- Authentication Links -->
+                    <?php if(auth()->guard()->guest()): ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?php echo e(route('login')); ?>"><?php echo e(__('Login')); ?></a>
+                        </li>
+                        <?php if(Route::has('register')): ?>
+                            <li class="nav-item">
+                                <a class="nav-link" href="<?php echo e(route('register')); ?>"><?php echo e(__('Register')); ?></a>
+                            </li>
+                        <?php endif; ?>
+                    <?php else: ?>
+                        <li class="nav-item dropdown">
+                            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                <?php echo e(Auth::user()->firstname); ?> <span class="caret"></span>
+                            </a>
+
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="<?php echo e(route('logout')); ?>"
+                                   onclick="event.preventDefault();
+                                                 document.getElementById('logout-form').submit();">
+                                    <?php echo e(__('Logout')); ?>
+
+                                </a>
+
+                                <form id="logout-form" action="<?php echo e(route('logout')); ?>" method="POST" style="display: none;">
+                                    <?php echo csrf_field(); ?>
+
+                                </form>
+                            </div>
+                        </li>
+                    <?php endif; ?>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div>
+    	<form  method="POST" action="<?php echo e(url('emergency')); ?>">
+            <?php echo csrf_field(); ?>
+
+    		<div>Latitude: <input type="hidden" name="lat" ><span id="latitude"></span></div></br>
+    		<div>Longitude: <input type="hidden" name="lng"><span id="longitude"></span></div></br>
+    		<div>My PhoneNumber: <input type="tel" name="phone" value="<?php echo e(Auth::user()->phone); ?>"></div></br>
+    		<div>TextMessage: <input id="status" type="hidden" name="status" value="waiting"><span>I need to help!!!</span></div></br>
+    		<button type="submit">Submit</button>
+    	</form>
+    </div>
+	<script>
+        $.ajax({
+            url: "https://geoip-db.com/jsonp",
+            jsonpCallback: "callback",
+            dataType: "jsonp",
+            success: function( location ) {
+                $('#latitude').html(location.latitude);
+                $('#longitude').html(location.longitude);
+                $('input[type=hidden][name=lat]').val(location.latitude);
+                $('input[type=hidden][name=lng]').val(location.longitude);         
+            }
+        }); 
+        // $(document).ready(function(){
+        //     if (navigator.geolocation) {
+        //         navigator.geolocation.getCurrentPosition(showPosition);
+
+        //     } else { 
+        //         console.log("Geolocation is not supported by this browser.");
+        //     }
+        // });
+        // function showPosition(position) {
+        //     $('#latitude').html(position.coords.latitude);
+        //     $('#longitude').html(position.coords.longitude);
+        //     $('input[type=hidden][name=lat]').val(position.coords.latitude);
+        //     $('input[type=hidden][name=lng]').val(position.coords.longitude);
+        // }    
+        // navigator.geolocation.getCurrentPosition(success => {
+        //     $('#latitude').html(position.coords.latitude);
+        //     $('#longitude').html(position.coords.longitude);
+        //     $('input[type=hidden][name=lat]').val(position.coords.latitude);
+        //     $('input[type=hidden][name=lng]').val(position.coords.longitude);
+        // }, failure => {
+        //   if (failure.message.startsWith("Only secure origins are allowed")) {
+        //     alert("fail");
+        // }
+        // });
+    </script>
+</body>
+</html>
